@@ -1,8 +1,8 @@
 ---
 
-# **NoteBuddy**
+# **TAMJAI**
 
-A full-stack note-posting web application with secure authentication, cloud file storage, and a responsive UI.
+desc
 
 ---
 
