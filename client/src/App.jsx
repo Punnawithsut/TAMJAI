@@ -1,8 +1,16 @@
+import { BrowserRouter, Routes, Route } from "react-router-dom" 
+
 function App() {
     return (
-    <div className="">
-      App
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route>
+          <Route path="/" />
+          <Route path="/information" />
+          <Route path="/ai" />
+        </Route>
+      </Routes>
+    </BrowserRouter>
   )
 }
 
