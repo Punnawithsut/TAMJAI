@@ -3,9 +3,9 @@ from flask import Flask, jsonify
 app = Flask(__name__)
 
 
-@app.route("/")
+@app.route("/", methods=["GET"])
 def index():
-    return jsonify({"message": "Server is running!"})
+    return jsonify({"success": True, "message": "Server is running!"})
 
 
 if __name__ == "__main__":
