@@ -1,11 +1,13 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 from pymongo import MongoClient
 from groq import Groq
 import os
 from dotenv import load_dotenv
+from flask_cors import CORS
 
 load_dotenv()
 app = Flask(__name__)
+CORS(app)
 
 
 client = MongoClient(os.getenv("MONGO_URI"))
@@ -20,9 +22,30 @@ def index():
     return jsonify({"success": True, "message": "Server is running!"})
 
 
-@app.route("/getData", methods=["POST"])
+@app.route("/addData", methods=["POST"])
+def addData():
+    try:
+        data = request.json
+        temp = data.get("temp")
+        humidity = data.get("humidity")
+        lux = lux.get("lux")
+
+        return jsonify({"success": True, "message": "Successfully add data into the Database"})
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)})
+
+
+@app.route("/getData", methods=["GET"])
 def getData():
-    return jsonify({"success": False, "message": "Successfully get sensor's data"})
+    try:
+        latest_data = collection.find_one(sort=[("time", -1)])
+
+        if not latest_data:
+            return jsonify({"success": False, "message": "No data found", "object": None})
+
+        return jsonify({"success": True, "message": "Successfully fetched latest data", "object": latest_data})
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e), "object": None})
 
 
 @app.route("/analyze", methods=["POST"])
@@ -50,10 +73,11 @@ def analyze():
         
         completion = groq_client.chat.completions.create(
             messages=[{"role": "user", "content": prompt}],
-            model="llama3-8b-8192", 
+            model="llama-3.1-8b-instant", 
         )
 
         advice = completion.choices[0].message.content.strip()
+        #print(advice)
 
         return jsonify({"success": True, "advice": advice, "message": "Successfully get AI advice"})
     except Exception as e:

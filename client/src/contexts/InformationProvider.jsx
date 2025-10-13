@@ -7,9 +7,9 @@ const baseUrl = "http://127.0.0.1:5000";
 axios.defaults.baseURL = baseUrl;
 
 export const InformationProvider = ({ children }) => {
-    const [temp, setTemp] = useState(null);
-    const [humidity, setHumidity] = useState(null);
-    const [lux, setLux] = useState(null);
+    const [temp, setTemp] = useState(10);
+    const [humidity, setHumidity] = useState(10);
+    const [lux, setLux] = useState(10);
     const [windowStatus, setWindowStatus] = useState(false);
     const [time, setTime] = useState(Date.now());
     const [message, setMessage] = useState("");
@@ -24,9 +24,10 @@ export const InformationProvider = ({ children }) => {
                 return;
             }
             setTemp(data.temp);
-            setTemp(data.humidity);
-            setTemp(data.lux);
-            setTemp(data.time);
+            setHumidity(data.humidity);
+            setLux(data.lux);
+            setTime(data.time);
+
             console.log(`Get sensor data at ${time}`);
         } catch (error) {
             const message = error.response?.data?.message || error.message;
@@ -50,6 +51,7 @@ export const InformationProvider = ({ children }) => {
                 return
             }
             toast.success(data.message);
+            console.log(data.advice)
             setMessage(data.advice);
         } catch (error) {
             const message = error.response?.data?.message || error.message;
