@@ -12,15 +12,45 @@ export const InformationProvider = ({ children }) => {
     const [lux, setLux] = useState(null);
     const [windowStatus, setWindowStatus] = useState(false);
     const [time, setTime] = useState(Date.now());
+    const [message, setMessage] = useState("");
 
     const getSensorData = async () => {
         try {
-            const response = await axios.get("getData");
-            console.log(response);
+            const response = await axios.get("/getData");
+            //console.log(response);
             const data = response.data;
             if(!data.success) {
-                toast.success(data.message);
+                toast.error(data.message);
+                return;
             }
+            setTemp(data.temp);
+            setTemp(data.humidity);
+            setTemp(data.lux);
+            setTemp(data.time);
+            console.log(`Get sensor data at ${time}`);
+        } catch (error) {
+            const message = error.response?.data?.message || error.message;
+            toast.error(message);
+        }
+    }
+
+    const analyze = async () => {
+        try {
+            const objects = {
+                "temp": temp,
+                "humidity": humidity,
+                "lux": lux, 
+                "time": time,
+            }
+            const response = await axios.post("/analyze", objects);
+            //console.log(response);
+            const data = response.data;
+            if(!data.success) {
+                toast.error(data.message);
+                return
+            }
+            toast.success(data.message);
+            setMessage(data.advice);
         } catch (error) {
             const message = error.response?.data?.message || error.message;
             toast.error(message);
@@ -33,12 +63,15 @@ export const InformationProvider = ({ children }) => {
         lux,
         windowStatus,
         time,
+        message,
         setTemp,
         setHumidity,
         setLux,
         setWindowStatus,
         setTime,
+        setMessage,
         getSensorData,
+        analyze,
     };
 
     return <InformationContext.Provider value={value}>
