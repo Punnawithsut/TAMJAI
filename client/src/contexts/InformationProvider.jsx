@@ -7,9 +7,9 @@ const baseUrl = "http://127.0.0.1:5000";
 axios.defaults.baseURL = baseUrl;
 
 export const InformationProvider = ({ children }) => {
-    const [temp, setTemp] = useState(10);
-    const [humidity, setHumidity] = useState(10);
-    const [lux, setLux] = useState(10);
+    const [temp, setTemp] = useState(null);
+    const [humidity, setHumidity] = useState(null);
+    const [lux, setLux] = useState(null);
     const [windowStatus, setWindowStatus] = useState(false);
     const [time, setTime] = useState(Date.now());
     const [message, setMessage] = useState("");
