@@ -32,7 +32,7 @@ def addData():
 
         print(temp, humidity, lux)
 
-        return jsonify({"success": True, 
+        return jsonify({"success": True,
                         "message": "Successfully add data into the Database"})
     except Exception as e:
         return jsonify({"success": False, "message": str(e)})
@@ -44,10 +44,10 @@ def getData():
         latest_data = collection.find_one(sort=[("time", -1)])
 
         if not latest_data:
-            return jsonify({"success": False, 
+            return jsonify({"success": False,
                             "message": "No data found", "object": None})
 
-        return jsonify({"success": True, 
+        return jsonify({"success": True,
                         "message": "Successfully fetched latest data", 
                         "object": latest_data})
     except Exception as e:
@@ -85,8 +85,8 @@ def analyze():
         advice = completion.choices[0].message.content.strip()
         # print(advice)
 
-        return jsonify({"success": True, 
-                        "advice": advice, 
+        return jsonify({"success": True,
+                        "advice": advice,
                         "message": "Successfully get AI advice"})
     except Exception as e:
         return jsonify({"success": False, "message": str(e)})
@@ -96,7 +96,7 @@ def analyze():
 def check_connection():
     try:
         client.admin.command("ping")
-        return jsonify({"success": True, 
+        return jsonify({"success": True,
                         "message": "Connected to MongoDB Atlas!"})
     except Exception as e:
         return jsonify({"success": False, "message": str(e)})
