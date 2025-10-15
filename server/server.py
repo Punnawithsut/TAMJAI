@@ -28,9 +28,12 @@ def addData():
         data = request.json
         temp = data.get("temp")
         humidity = data.get("humidity")
-        lux = lux.get("lux")
+        lux = data.get("lux")
 
-        return jsonify({"success": True, "message": "Successfully add data into the Database"})
+        print(temp, humidity, lux)
+
+        return jsonify({"success": True, 
+                        "message": "Successfully add data into the Database"})
     except Exception as e:
         return jsonify({"success": False, "message": str(e)})
 
@@ -41,9 +44,12 @@ def getData():
         latest_data = collection.find_one(sort=[("time", -1)])
 
         if not latest_data:
-            return jsonify({"success": False, "message": "No data found", "object": None})
+            return jsonify({"success": False, 
+                            "message": "No data found", "object": None})
 
-        return jsonify({"success": True, "message": "Successfully fetched latest data", "object": latest_data})
+        return jsonify({"success": True, 
+                        "message": "Successfully fetched latest data", 
+                        "object": latest_data})
     except Exception as e:
         return jsonify({"success": False, "message": str(e), "object": None})
 
@@ -58,7 +64,8 @@ def analyze():
         time = data.get("time")
 
         if temp is None or humidity is None or lux is None:
-            return jsonify({"success": False, "message": "Missing sensor data"})
+            return jsonify({"success": False, 
+                            "message": "Missing sensor data"})
 
         prompt = f"""
         You are a smart home assistant.
@@ -70,16 +77,17 @@ def analyze():
 
         Suggest short advice (2–3 sentences) for improving room comfort.
         """
-        
         completion = groq_client.chat.completions.create(
             messages=[{"role": "user", "content": prompt}],
             model="llama-3.1-8b-instant", 
         )
 
         advice = completion.choices[0].message.content.strip()
-        #print(advice)
+        # print(advice)
 
-        return jsonify({"success": True, "advice": advice, "message": "Successfully get AI advice"})
+        return jsonify({"success": True, 
+                        "advice": advice, 
+                        "message": "Successfully get AI advice"})
     except Exception as e:
         return jsonify({"success": False, "message": str(e)})
 
@@ -88,11 +96,11 @@ def analyze():
 def check_connection():
     try:
         client.admin.command("ping")
-        return jsonify({"success": True, "message": "Connected to MongoDB Atlas!"})
+        return jsonify({"success": True, 
+                        "message": "Connected to MongoDB Atlas!"})
     except Exception as e:
         return jsonify({"success": False, "message": str(e)})
 
 
 if __name__ == "__main__":
     app.run(debug=True)
-
