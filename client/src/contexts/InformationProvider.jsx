@@ -7,9 +7,9 @@ const baseUrl = "https://comfortzone-backend.onrender.com";
 axios.defaults.baseURL = baseUrl;
 
 export const InformationProvider = ({ children }) => {
-    const [temp, setTemp] = useState(null);
-    const [humidity, setHumidity] = useState(null);
-    const [lux, setLux] = useState(null);
+    const [temp, setTemp] = useState(10);
+    const [humidity, setHumidity] = useState(10);
+    const [lux, setLux] = useState(10);
     const [windowStatus, setWindowStatus] = useState(false);
     const [time, setTime] = useState(Date.now());
     const [message, setMessage] = useState("");
@@ -59,6 +59,26 @@ export const InformationProvider = ({ children }) => {
         }
     }
 
+    //const addData = async () => {
+    //    try {
+    //        const objects = {
+    //            "temp": temp,
+    //            "humidity": humidity,
+    //            "lux": lux, 
+    //        }
+    //        const response = await axios.post("/addData", objects);
+    //        const data = response.data;
+    //        if(!data.success) {
+    //            toast.error(data.message);
+    //            return
+    //        }
+    //        toast.success(data.message);
+    //    } catch (error) {
+    //        const message = error.response?.data?.message || error.message;
+    //        toast.error(message);
+    //    }
+    //}
+//
     const value = {
         temp, 
         humidity,

@@ -6,7 +6,9 @@ const Dashboard = () => {
 
   return (
     <div className="w-full min-h-screen bg-[#f1f1f1]">
-      Dashboard
+      <div>
+
+      </div>
     </div>
   )
 }
