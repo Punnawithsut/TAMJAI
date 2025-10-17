@@ -22,6 +22,8 @@ def index():
     return jsonify({"success": True, "message": "Server is running!"})
 
 
+from datetime import datetime
+
 @app.route("/addData", methods=["POST"])
 def addData():
     try:
@@ -30,12 +32,24 @@ def addData():
         humidity = data.get("humidity")
         lux = data.get("lux")
 
-        print(temp, humidity, lux)
+        document = {
+            "temp": temp,
+            "humidity": humidity,
+            "lux": lux,
+            "time": datetime.utcnow()
+        }
 
-        return jsonify({"success": True,
-                        "message": "Successfully add data into the Database"})
+        result = collection.insert_one(document)
+        print(f"Inserted document with id {result.inserted_id}")
+
+        return jsonify({
+            "success": True,
+            "message": "Successfully added data into the Database",
+            "id": str(result.inserted_id)
+        })
     except Exception as e:
         return jsonify({"success": False, "message": str(e)})
+
 
 
 @app.route("/getData", methods=["GET"])
