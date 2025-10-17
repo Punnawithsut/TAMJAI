@@ -40,7 +40,7 @@ def addData():
         }
 
         result = collection.insert_one(document)
-        print(f"Inserted document with id {result.inserted_id}")
+        #print(f"Inserted document with id {result.inserted_id}")
 
         return jsonify({
             "success": True,
