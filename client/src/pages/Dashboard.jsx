@@ -1,9 +1,9 @@
 import { useContext } from "react";
 import { InformationContext } from "../contexts/InformationContext";
+import DarknessSlider from "../components/DarknessSlider";
 
 const Dashboard = () => {
-  const { temp, humidity, lux, windowStatus, setWindowStatus } =
-    useContext(InformationContext);
+  const { temp, humidity, lux, windowStatus, setWindowStatus } = useContext(InformationContext);
 
   return (
     <div className="w-full min-h-screen bg-[#f1f1f1] flex flex-col items-center p-6">
@@ -50,13 +50,8 @@ const Dashboard = () => {
           <h3 className="font-bold text-lg mb-4 text-center">Control Panel</h3>
 
           <div className="flex flex-col gap-6">
-            {/* Darkness */}
-            <div>
-              <p className="mb-2 font-medium">Darkness</p>
-              <div className="w-full bg-[#1800ad] h-6 rounded-full relative">
-                <div className="absolute left-0 top-0 w-6 h-6 bg-white rounded-full shadow"></div>
-              </div>
-            </div>
+            {/* Darkness Slider */}
+            <DarknessSlider />
 
             {/* Window Status */}
             <div>

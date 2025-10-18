@@ -13,6 +13,8 @@ export const InformationProvider = ({ children }) => {
     const [windowStatus, setWindowStatus] = useState(false);
     const [time, setTime] = useState(Date.now());
     const [message, setMessage] = useState("");
+    const [weather, setWeather] = useState("Sunny");
+    const [darkness, setDarkness] = useState(0);
 
     const getSensorData = async () => {
         try {
@@ -86,12 +88,16 @@ export const InformationProvider = ({ children }) => {
         windowStatus,
         time,
         message,
+        weather,
+        darkness,
         setTemp,
         setHumidity,
         setLux,
         setWindowStatus,
         setTime,
         setMessage,
+        setWeather,
+        setDarkness,
         getSensorData,
         analyze,
     };
