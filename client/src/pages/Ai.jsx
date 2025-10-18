@@ -23,13 +23,18 @@ const Ai = () => {
 
   useEffect(() => {
     if (!message) return;
+    // console.log(message);
     let index = 0;
-    setTypedMessage("");
+    setTypedMessage(message[0]);
     const interval = setInterval(() => {
-      setTypedMessage((prev) => prev + message[index]);
-      index++;
-      if (index >= message.length) clearInterval(interval);
+      if (index < message.length - 1) {
+        setTypedMessage((prev) => prev + message[index]);
+        index++;
+      } else {
+        clearInterval(interval);
+      }
     }, 40);
+
     return () => clearInterval(interval);
   }, [message]);
 
