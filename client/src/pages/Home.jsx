@@ -1,7 +1,9 @@
+import Footer from "../components/Footer";
+
 const Home = () => {
   return (
     <div className="min-h-screen bg-[#f1f1f1] flex flex-col">
-      {/* Hero Section */}
+      {/* Main Section */}
       <section className="flex flex-col items-center justify-center text-center bg-gradient-to-br from-[#1800ad] to-[#5e4bff] text-white py-24 px-6">
         <h1 className="text-5xl font-extrabold mb-4">Comfort Zone</h1>
         <p className="text-lg max-w-2xl mb-8">
@@ -53,11 +55,7 @@ const Home = () => {
           </div>
         </div>
       </section>
-
-      {/* Footer Section */}
-      <footer className="bg-[#1800ad] text-white text-center py-6 mt-auto">
-        <p className="text-sm">© 2025 Comfort Zone. All rights reserved.</p>
-      </footer>
+      <Footer/>
     </div>
   );
 };
