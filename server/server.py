@@ -4,6 +4,7 @@ from groq import Groq
 import os
 from dotenv import load_dotenv
 from flask_cors import CORS
+from datetime import datetime
 
 load_dotenv()
 app = Flask(__name__)
@@ -22,8 +23,6 @@ def index():
     return jsonify({"success": True, "message": "Server is running!"})
 
 
-from datetime import datetime
-
 @app.route("/addData", methods=["POST"])
 def addData():
     try:
@@ -40,7 +39,7 @@ def addData():
         }
 
         result = collection.insert_one(document)
-        print(f"Inserted document with id {result.inserted_id}")
+        # print(f"Inserted document with id {result.inserted_id}")
 
         return jsonify({
             "success": True,
@@ -49,7 +48,6 @@ def addData():
         })
     except Exception as e:
         return jsonify({"success": False, "message": str(e)})
-
 
 
 @app.route("/getData", methods=["GET"])
@@ -76,32 +74,41 @@ def analyze():
         humidity = data.get("humidity")
         lux = data.get("lux")
         time = data.get("time")
+        custom_prompt = data.get("prompt")
 
         if temp is None or humidity is None or lux is None:
-            return jsonify({"success": False, 
-                            "message": "Missing sensor data"})
+            return jsonify({
+                "success": False, 
+                "message": "Missing sensor data"
+            })
 
-        prompt = f"""
+        base_prompt = f"""
         You are a smart home assistant.
         Room conditions:
         - Temperature: {temp}°C
         - Humidity: {humidity}%
         - Light level: {lux} lux
         - Time: {time}
-
-        Suggest short advice (2–3 sentences) for improving room comfort.
         """
+
+        if custom_prompt.strip():
+            prompt = f"{base_prompt}\n\nUser request: {custom_prompt}\n\nGive a short, helpful response (2–3 sentences)."
+        else:
+            prompt = f"{base_prompt}\n\nSuggest short advice (2–3 sentences) for improving room comfort."
+
         completion = groq_client.chat.completions.create(
             messages=[{"role": "user", "content": prompt}],
             model="llama-3.1-8b-instant", 
         )
 
         advice = completion.choices[0].message.content.strip()
-        # print(advice)
 
-        return jsonify({"success": True,
-                        "advice": advice,
-                        "message": "Successfully get AI advice"})
+        return jsonify({
+            "success": True,
+            "advice": advice,
+            "message": "Successfully got AI advice"
+        })
+
     except Exception as e:
         return jsonify({"success": False, "message": str(e)})
 
