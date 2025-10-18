@@ -4,6 +4,7 @@ from groq import Groq
 import os
 from dotenv import load_dotenv
 from flask_cors import CORS
+from datetime import datetime
 
 load_dotenv()
 app = Flask(__name__)
@@ -22,8 +23,6 @@ def index():
     return jsonify({"success": True, "message": "Server is running!"})
 
 
-from datetime import datetime
-
 @app.route("/addData", methods=["POST"])
 def addData():
     try:
@@ -40,7 +39,7 @@ def addData():
         }
 
         result = collection.insert_one(document)
-        #print(f"Inserted document with id {result.inserted_id}")
+        # print(f"Inserted document with id {result.inserted_id}")
 
         return jsonify({
             "success": True,
@@ -49,7 +48,6 @@ def addData():
         })
     except Exception as e:
         return jsonify({"success": False, "message": str(e)})
-
 
 
 @app.route("/getData", methods=["GET"])
