@@ -55,16 +55,14 @@ export const InformationProvider = ({ children }) => {
 
       if (!data.success) {
         toast.error(data.message);
-        return null;
+        return;
       }
 
       toast.success("AI advice received!");
       setMessage(data.advice);
-      return data.advice;
     } catch (error) {
       const message = error.response?.data?.message || error.message;
       toast.error(message);
-      return null;
     }
   };
 
