@@ -3,7 +3,7 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { InformationContext } from "./InformationContext";
 
-const baseUrl = "https://comfortzone-backend.onrender.com";
+const baseUrl = "http://127.0.0.1:5000/";
 axios.defaults.baseURL = baseUrl;
 
 export const InformationProvider = ({ children }) => {
@@ -29,11 +29,12 @@ export const InformationProvider = ({ children }) => {
         return;
       }
 
-      setTemp(data.temp);
-      setHumidity(data.humidity);
-      setLux(data.lux);
-      setTime(data.time);
-      console.log(`Get sensor data at ${time}`);
+      const sensor = data.object;
+      setTemp(sensor.temp);
+      setHumidity(sensor.humidity);
+      setLux(sensor.lux);
+      setTime(sensor.time);
+      //console.log(`Get sensor data at ${time}`);
     } catch (error) {
       const message = error.response?.data?.message || error.message;
       toast.error(message);

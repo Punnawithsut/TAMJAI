@@ -5,6 +5,7 @@ import os
 from dotenv import load_dotenv
 from flask_cors import CORS
 from datetime import datetime
+from bson import ObjectId
 
 load_dotenv()
 app = Flask(__name__)
@@ -56,12 +57,21 @@ def getData():
         latest_data = collection.find_one(sort=[("time", -1)])
 
         if not latest_data:
-            return jsonify({"success": False,
-                            "message": "No data found", "object": None})
+            return jsonify({
+                "success": False,
+                "message": "No data found",
+                "object": None
+            })
 
-        return jsonify({"success": True,
-                        "message": "Successfully fetched latest data", 
-                        "object": latest_data})
+        latest_data["_id"] = str(latest_data["_id"])
+        if "time" in latest_data:
+            latest_data["time"] = latest_data["time"].isoformat()
+
+        return jsonify({
+            "success": True,
+            "message": "Successfully fetched latest data",
+            "object": latest_data
+        })
     except Exception as e:
         return jsonify({"success": False, "message": str(e), "object": None})
 

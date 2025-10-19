@@ -1,9 +1,17 @@
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { InformationContext } from "../contexts/InformationContext";
 import DarknessSlider from "../components/DarknessSlider";
 
 const Dashboard = () => {
-  const { temp, humidity, lux, windowStatus, setWindowStatus } = useContext(InformationContext);
+  const { temp, humidity, lux, windowStatus, setWindowStatus, getSensorData } = useContext(InformationContext);
+
+  useEffect(() => {
+    getSensorData();
+    const interval = setInterval(() => {
+      getSensorData()
+    }, 20000);
+    return () => clearInterval(interval);
+  }, [])
 
   return (
     <div className="w-full min-h-screen bg-[#f1f1f1] flex flex-col items-center p-6">
