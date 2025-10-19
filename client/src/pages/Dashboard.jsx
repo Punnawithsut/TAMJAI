@@ -4,6 +4,12 @@ import DarknessSlider from "../components/DarknessSlider";
 
 const Dashboard = () => {
   const { temp, humidity, lux, windowStatus, setWindowStatus, getSensorData } = useContext(InformationContext);
+  const tempEmojis = ["🥶", "🤧", "😊", "🥵", "🔥"];
+  const luxEmojis = ["☁️", "⛅", "☀️"];
+
+  //const tempData;
+  //const humidityData;
+  //const luxData;
 
   useEffect(() => {
     getSensorData();
@@ -27,12 +33,10 @@ const Dashboard = () => {
               key={index}
               className="bg-white shadow rounded-2xl p-4 flex flex-col items-center justify-center"
             >
-              <img
-                src="https://em-content.zobj.net/source/microsoft-teams/363/face-with-monocle_1f9d0.png"
-                alt="emoji"
-                className="w-14 h-14 mb-2"
-              />
               <h2 className="font-semibold text-lg mb-1">{item.title}</h2>
+              {item.title === "Temperature" && <p>{tempEmojis[0]}</p>}
+              {item.title === "Humidity" && <p>Humidity Scale</p>}
+              {item.title === "Light Intensity" && <p>{luxEmojis[0]}</p>}
               <p className="text-xl font-bold text-gray-700">{item.value}</p>
             </div>
           ))}
