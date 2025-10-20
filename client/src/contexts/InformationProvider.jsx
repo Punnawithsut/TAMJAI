@@ -120,7 +120,7 @@ export const InformationProvider = ({ children }) => {
   const getWeather = async () => {
     try {
       const location = await getLocation();
-
+      
       const response = await axios.post("/getWeather", {
         location: location,
       });
