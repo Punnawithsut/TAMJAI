@@ -4,7 +4,7 @@ import DarknessSlider from "../components/DarknessSlider";
 import Scale from "../components/Scale";
 
 const Dashboard = () => {
-  const { temp, humidity, lux, windowStatus, setWindowStatus, getSensorData } = useContext(InformationContext);
+  const { temp, humidity, lux, windowStatus, setWindowStatus, getSensorData, getWeather } = useContext(InformationContext);
   const tempEmojis = ["🥶", "🤧", "😊", "🥵", "🔥"];
   const luxEmojis = ["☁️", "⛅", "☀️"];
 
@@ -14,6 +14,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     getSensorData();
+    getWeather();
     const interval = setInterval(() => {
       getSensorData()
     }, 20000);

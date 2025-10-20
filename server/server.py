@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 from flask_cors import CORS
 from datetime import datetime
 from bson import ObjectId
+import requests
 
 load_dotenv()
 app = Flask(__name__)
@@ -17,6 +18,8 @@ db = client["ComfortZone"]
 collection = db["SensorData"]
 
 groq_client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+
+weather_api_key = os.getenv("WEATHER_API_KEY")
 
 
 @app.route("/", methods=["GET"])
@@ -121,6 +124,30 @@ def analyze():
 
     except Exception as e:
         return jsonify({"success": False, "message": str(e)})
+
+
+@app.route("/getWeather", methods=["POST"])
+def getWeather():
+    try:
+        location = request.args.get("location")
+        if not location:
+            return jsonify({"success": False,
+                "Message": "Location doesn't provide"})
+        url = f"http://api.weatherapi.com/v1/current.json?key={weather_api_key}&q={location}"
+        response = requests.get(url)
+
+        if response.status_code == 200:
+            data = response.json()
+            result = {
+
+            }
+        return jsonify({"success": True,
+            "message": "Successfully get weather data",
+            "object": result})
+    except Exception as e:
+        return jsonify({"success": False, 
+            "message": "Failed to get sensor data",
+            "object": None})
 
 
 @app.route("/check_connection", methods=["GET"])

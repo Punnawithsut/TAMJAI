@@ -15,9 +15,14 @@ export const InformationProvider = ({ children }) => {
   const [message, setMessage] = useState("");
   const [weather, setWeather] = useState("Sunny");
   const [darkness, setDarkness] = useState(0);
-  const [customData, setCustomData] = useState({"temp": null, "humidity": null, "lux": null});
+  const [customData, setCustomData] = useState({
+    temp: null,
+    humidity: null,
+    lux: null,
+  });
   const [customPrompt, setCustomPrompt] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [apiWeather, setApiWeather] = useState(null);
 
   const getSensorData = async () => {
     try {
@@ -48,7 +53,7 @@ export const InformationProvider = ({ children }) => {
         humidity: customData?.humidity ?? humidity,
         lux: customData?.lux ?? lux,
         time,
-        prompt: customPrompt || "Give general room comfort advice."
+        prompt: customPrompt || "Give general room comfort advice.",
       };
 
       const response = await axios.post("/analyze", payload);
@@ -67,6 +72,73 @@ export const InformationProvider = ({ children }) => {
     }
   };
 
+  const getLocation = async () => {
+    return new Promise((resolve, reject) => {
+      if (!navigator.geolocation) {
+        toast.error("Geolocation is not supported by your browser");
+        return reject("Geolocation not supported");
+      }
+
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          const { latitude, longitude } = position.coords;
+
+          try {
+            const response = await axios.get(
+              `https://nominatim.openstreetmap.org/reverse`,
+              {
+                params: {
+                  lat: latitude,
+                  lon: longitude,
+                  format: "json",
+                },
+              }
+            );
+
+            const locationName =
+              response.data.address.city ||
+              response.data.address.town ||
+              response.data.address.village ||
+              response.data.address.county ||
+              "Unknown location";
+
+            resolve(locationName);
+          } catch (error) {
+            toast.error("Failed to get location name");
+            reject(error);
+          }
+        },
+        (error) => {
+          toast.error("Unable to retrieve your location");
+          reject(error);
+        },
+        { enableHighAccuracy: true }
+      );
+    });
+  };
+
+  const getWeather = async () => {
+    try {
+      const location = await getLocation();
+
+      const response = await axios.post("/getWeather", {
+        location: location,
+      });
+
+      const data = response.data;
+      if(!data.success) {
+        toast.error(data.message);
+        return
+      }
+
+      setApiWeather(data.object);
+      toast.success(data.message);
+    } catch (error) {
+      const message = error.response?.data?.message || error.message;
+      toast.error(message);
+    }
+  };
+
   const value = {
     temp,
     humidity,
@@ -79,6 +151,7 @@ export const InformationProvider = ({ children }) => {
     customData,
     customPrompt,
     isLoading,
+    apiWeather,
     setTemp,
     setHumidity,
     setLux,
@@ -90,8 +163,10 @@ export const InformationProvider = ({ children }) => {
     setCustomData,
     setCustomPrompt,
     setIsLoading,
+    setApiWeather,
     getSensorData,
     analyze,
+    getWeather,
   };
 
   return (
