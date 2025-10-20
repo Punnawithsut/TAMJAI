@@ -72,7 +72,7 @@ const Dashboard = () => {
                 className={`w-14 h-8 flex items-center rounded-full p-1 cursor-pointer transition-colors duration-300 ${
                   windowStatus ? "bg-[#1800ad]" : "bg-gray-300"
                 }`}
-                onClick={() => setWindowStatus(!windowStatus)}
+                onClick={() => handleWindowStatusChange(!windowStatus)}
               >
                 <div
                   className={`bg-white w-6 h-6 rounded-full shadow transform transition-transform duration-300 ${

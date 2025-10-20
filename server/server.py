@@ -132,6 +132,27 @@ def check_connection():
     except Exception as e:
         return jsonify({"success": False, "message": str(e)})
 
+# store the latest command
+window_command = None
+
+@app.route("/setWindowStatus", methods=["POST"])
+def set_window_status():
+    global window_command
+    data = request.json
+    status = data.get("status")
+    window_command = status
+    return jsonify({"success": True, "message": "Command stored!"})
+
+@app.route("/getWindowCommand", methods=["GET"])
+def get_window_command():
+    global window_command
+    if window_command is None:
+        return jsonify({})
+    else:
+        cmd = window_command
+        window_command = None  # clear after sending
+        return jsonify({"status": cmd})
+
 
 if __name__ == "__main__":
     app.run(debug=True)
