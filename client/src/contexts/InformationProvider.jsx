@@ -10,7 +10,8 @@ export const InformationProvider = ({ children }) => {
   const [temp, setTemp] = useState(null);
   const [humidity, setHumidity] = useState(null);
   const [lux, setLux] = useState(null);
-  const [windowStatus, setWindowStatus] = useState(false);
+  const [windowStatus, setWindowStatusState] = useState(false);
+
   const [time, setTime] = useState(Date.now());
   const [message, setMessage] = useState("");
   const [weather, setWeather] = useState("Sunny");
@@ -66,6 +67,18 @@ export const InformationProvider = ({ children }) => {
       toast.error(message);
     }
   };
+
+  const handleWindowStatusChange = async (status) => {
+    setWindowStatusState(status); // update local state immediately
+    try {
+      await axios.post("/setWindowStatus", { status }); // call your server endpoint
+      toast.success(`Window turned ${status ? "ON" : "OFF"}`);
+    } catch (error) {
+      const message = error.response?.data?.message || error.message;
+      toast.error(message);
+    }
+  };
+
 
   const value = {
     temp,
