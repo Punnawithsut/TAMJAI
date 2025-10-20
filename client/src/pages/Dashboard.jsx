@@ -1,6 +1,7 @@
 import { useContext, useEffect } from "react";
 import { InformationContext } from "../contexts/InformationContext";
 import DarknessSlider from "../components/DarknessSlider";
+import Scale from "../components/Scale";
 
 const Dashboard = () => {
   const { temp, humidity, lux, windowStatus, setWindowStatus, getSensorData } = useContext(InformationContext);
@@ -34,9 +35,13 @@ const Dashboard = () => {
               className="bg-white shadow rounded-2xl p-4 flex flex-col items-center justify-center"
             >
               <h2 className="font-semibold text-lg mb-1">{item.title}</h2>
-              {item.title === "Temperature" && <p>{tempEmojis[0]}</p>}
-              {item.title === "Humidity" && <p>Humidity Scale</p>}
-              {item.title === "Light Intensity" && <p>{luxEmojis[0]}</p>}
+              {item.title === "Temperature" && <p className="text-6xl mb-4 mt-4">{
+                temp < 5 ? tempEmojis[0] : temp < 10 ? tempEmojis[1] : temp < 20 ? tempEmojis[2] : temp < 30 ? tempEmojis[3] : tempEmojis[4]
+                }</p>}
+              {item.title === "Humidity" && <Scale value={humidity}/>}
+              {item.title === "Light Intensity" && <p className="text-6xl mb-4 mt-4">{
+                  lux < 250 ? luxEmojis[0] : temp < 750 ? luxEmojis[1] : luxEmojis[2]
+                }</p>}
               <p className="text-xl font-bold text-gray-700">{item.value}</p>
             </div>
           ))}
