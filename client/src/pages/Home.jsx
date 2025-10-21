@@ -1,8 +1,9 @@
 import Footer from "../components/Footer";
 
 const Home = () => {
+
   return (
-    <div className="min-h-screen bg-[#f1f1f1] flex flex-col">
+    <div className="min-h-screen bg-[#ffffff] flex flex-col">
       {/* Main Section */}
       <section className="flex flex-col items-center justify-center text-center bg-gradient-to-br from-[#1800ad] to-[#5e4bff] text-white py-24 px-6">
         <h1 className="text-5xl font-extrabold mb-4">Comfort Zone</h1>

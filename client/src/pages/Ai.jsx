@@ -21,6 +21,10 @@ const Ai = () => {
   const [useCustom, setUseCustom] = useState(false);
   const [typedMessage, setTypedMessage] = useState("");
 
+  //useEffect(() => {
+  //  setMessage("");
+  //}, [])
+
   useEffect(() => {
     if (!message) return;
     // console.log(message);
@@ -49,7 +53,7 @@ const Ai = () => {
     <div className="w-full min-h-screen bg-[#f9fafb] flex flex-col items-center justify-center p-6">
       <div className="bg-white shadow-lg rounded-2xl p-6 w-full max-w-lg">
         <h1 className="text-2xl font-semibold text-gray-800 mb-4 text-center">
-          AI Comfort Advisor 🤖
+          AI Comfort Advisor
         </h1>
 
         {/* Use Current Data or Custom */}
@@ -109,9 +113,9 @@ const Ai = () => {
           </div>
         ) : (
           <div className="text-sm text-gray-700 mb-6 space-y-1">
-            <p>🌡️ Temperature: {temp ?? "—"}°C</p>
-            <p>💧 Humidity: {humidity ?? "—"}%</p>
-            <p>💡 Light: {lux ?? "—"} lux</p>
+            <p>Temperature: {temp ?? "—"}°C</p>
+            <p>Humidity: {humidity ?? "—"}%</p>
+            <p>Light: {lux ?? "—"} lux</p>
           </div>
         )}
 

@@ -5,6 +5,7 @@ import os
 from dotenv import load_dotenv
 from flask_cors import CORS
 from datetime import datetime
+import requests
 
 load_dotenv()
 app = Flask(__name__)
@@ -16,6 +17,8 @@ db = client["ComfortZone"]
 collection = db["SensorData"]
 
 groq_client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+
+weather_api_key = os.getenv("WEATHER_API_KEY")
 
 
 @app.route("/", methods=["GET"])
@@ -56,12 +59,21 @@ def getData():
         latest_data = collection.find_one(sort=[("time", -1)])
 
         if not latest_data:
-            return jsonify({"success": False,
-                            "message": "No data found", "object": None})
+            return jsonify({
+                "success": False,
+                "message": "No data found",
+                "object": None
+            })
 
-        return jsonify({"success": True,
-                        "message": "Successfully fetched latest data", 
-                        "object": latest_data})
+        latest_data["_id"] = str(latest_data["_id"])
+        if "time" in latest_data:
+            latest_data["time"] = latest_data["time"].isoformat()
+
+        return jsonify({
+            "success": True,
+            "message": "Successfully fetched latest data",
+            "object": latest_data
+        })
     except Exception as e:
         return jsonify({"success": False, "message": str(e), "object": None})
 
@@ -111,6 +123,37 @@ def analyze():
 
     except Exception as e:
         return jsonify({"success": False, "message": str(e)})
+
+
+@app.route("/getWeather", methods=["POST"])
+def getWeather():
+    try:
+        data = request.json
+        location = data.get("location")
+        if not location:
+            return jsonify({"success": False,
+                "message": "Location doesn't provide"})
+        url = f"http://api.weatherapi.com/v1/current.json?key={weather_api_key}&q={location}"
+        response = requests.get(url)
+
+        if response.status_code == 200:
+            data = response.json()
+            current = data.get("current", {})
+
+            result = {
+                "location": data.get("location", {}).get("name", "Unknown"),
+                "temp": current.get("feelslike_c"),
+                "windSpeed": current.get("wind_kph"),
+                "uv": current.get("uv"),
+            }
+
+        return jsonify({"success": True,
+            "message": "Successfully get weather data",
+            "object": result})
+    except Exception as e:
+        return jsonify({"success": False, 
+            "message": e,
+            "object": None})
 
 
 @app.route("/check_connection", methods=["GET"])
