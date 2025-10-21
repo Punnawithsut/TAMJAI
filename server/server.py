@@ -129,18 +129,25 @@ def analyze():
 @app.route("/getWeather", methods=["POST"])
 def getWeather():
     try:
-        location = request.args.get("location")
+        data = request.json
+        location = data.get("location")
         if not location:
             return jsonify({"success": False,
-                "Message": "Location doesn't provide"})
+                "message": "Location doesn't provide"})
         url = f"http://api.weatherapi.com/v1/current.json?key={weather_api_key}&q={location}"
         response = requests.get(url)
 
         if response.status_code == 200:
             data = response.json()
-            result = {
+            current = data.get("current", {})
 
+            result = {
+                "location": data.get("location", {}).get("name", "Unknown"),
+                "temp": current.get("feelslike_c"),
+                "windSpeed": current.get("wind_kph"),
+                "uv": current.get("uv"),
             }
+
         return jsonify({"success": True,
             "message": "Successfully get weather data",
             "object": result})

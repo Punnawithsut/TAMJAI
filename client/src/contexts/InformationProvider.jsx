@@ -22,7 +22,13 @@ export const InformationProvider = ({ children }) => {
   });
   const [customPrompt, setCustomPrompt] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [apiWeather, setApiWeather] = useState(null);
+  const [apiWeather, setApiWeather] = useState({
+    "location" : null,
+    "temp" : null,
+    "uv" : null,
+    "windSpeed" : null,
+  });
+  const [dataHistory, setDataHistory] = useState([]);
 
   const getSensorData = async () => {
     try {
@@ -120,6 +126,7 @@ export const InformationProvider = ({ children }) => {
   const getWeather = async () => {
     try {
       const location = await getLocation();
+      //console.log(location);
       
       const response = await axios.post("/getWeather", {
         location: location,
@@ -128,10 +135,12 @@ export const InformationProvider = ({ children }) => {
       const data = response.data;
       if(!data.success) {
         toast.error(data.message);
+        //console.log(data.message);
         return
       }
 
       setApiWeather(data.object);
+      console.log(data.object);
       toast.success(data.message);
     } catch (error) {
       const message = error.response?.data?.message || error.message;
@@ -152,6 +161,7 @@ export const InformationProvider = ({ children }) => {
     customPrompt,
     isLoading,
     apiWeather,
+    dataHistory,
     setTemp,
     setHumidity,
     setLux,
@@ -164,6 +174,7 @@ export const InformationProvider = ({ children }) => {
     setCustomPrompt,
     setIsLoading,
     setApiWeather,
+    setDataHistory,
     getSensorData,
     analyze,
     getWeather,
