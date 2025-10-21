@@ -5,7 +5,6 @@ import os
 from dotenv import load_dotenv
 from flask_cors import CORS
 from datetime import datetime
-from bson import ObjectId
 import requests
 
 load_dotenv()
@@ -153,7 +152,7 @@ def getWeather():
             "object": result})
     except Exception as e:
         return jsonify({"success": False, 
-            "message": "Failed to get sensor data",
+            "message": e,
             "object": None})
 
 
