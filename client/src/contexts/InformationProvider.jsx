@@ -105,6 +105,7 @@ export const InformationProvider = ({ children }) => {
     setIsLoading,
     getSensorData,
     analyze,
+    handleWindowStatusChange,
   };
 
   return (
