@@ -13,8 +13,10 @@ const Dashboard = () => {
 
   useEffect(() => {
     getSensorData();
+    getWindowStatus();
     const interval = setInterval(() => {
       getSensorData()
+      getWindowStatus();
     }, 20000);
     return () => clearInterval(interval);
   }, [])
