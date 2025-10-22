@@ -10,8 +10,7 @@ export const InformationProvider = ({ children }) => {
   const [temp, setTemp] = useState(null);
   const [humidity, setHumidity] = useState(null);
   const [lux, setLux] = useState(null);
-  const [windowStatus, setWindowStatusState] = useState(false);
-
+  const [windowStatus, setWindowStatus] = useState(false);
   const [time, setTime] = useState(Date.now());
   const [message, setMessage] = useState("");
   const [weather, setWeather] = useState("Sunny");
@@ -69,7 +68,7 @@ export const InformationProvider = ({ children }) => {
   };
 
   const handleWindowStatusChange = async (status) => {
-    setWindowStatusState(status); // update local state immediately
+    setWindowStatus(status); // update local state immediately
     try {
       await axios.post("/setWindowStatus", { status }); // call your server endpoint
       toast.success(`Window turned ${status ? "ON" : "OFF"}`);
@@ -79,6 +78,22 @@ export const InformationProvider = ({ children }) => {
     }
   };
 
+  const getWindowStatus = async () => {
+  try {
+    const response = await axios.get("/getWindowStatus");
+    const data = response.data;
+
+    if (!data.success) {
+      toast.error(data.message);
+      return;
+    }
+
+    setWindowStatus(data.status);
+  } catch (error) {
+    const message = error.response?.data?.message || error.message;
+    toast.error(message);
+  }
+};
 
   const value = {
     temp,
@@ -104,6 +119,7 @@ export const InformationProvider = ({ children }) => {
     setCustomPrompt,
     setIsLoading,
     getSensorData,
+    getWindowStatus,
     analyze,
     handleWindowStatusChange,
   };
