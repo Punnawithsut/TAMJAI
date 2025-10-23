@@ -26,30 +26,34 @@ collection = db["SensorData"]
 groq_client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
 # === MQTT Setup ===
-broker = 'broker.hivemq.com'  # Public MQTT broker
+broker = "broker.hivemq.com"   # Public MQTT broker
 port_mqtt = 1883
 topic_command = "comfortzone/command"
 topic_sensor = "comfortzone/sensor"
-client_id = f'flask-{random.randint(0, 1000)}'
+client_id = f"flask-{random.randint(0, 1000)}"
 
-mqtt_client_instance = mqtt_client.Client(mqtt_client.CallbackAPIVersion.VERSION1, client_id)
+mqtt_client_instance = mqtt_client.Client(
+    callback_api_version=mqtt_client.CallbackAPIVersion.VERSION1,
+    client_id=client_id
+)
 
-# Store current window status
-current_window_status = False
+current_window_status = False  # Store current window status
+
 
 # === MQTT Event Handlers ===
 def on_connect(client, userdata, flags, rc):
     if rc == 0:
+        print("✅ MQTT connected successfully")
         client.subscribe(topic_sensor)
-
     else:
-        print(f"MQTT failed to connect, return code {rc}")
+        print(f"❌ MQTT failed to connect, return code {rc}")
+
 
 def on_message(client, userdata, msg):
     """Receive sensor data from Arduino via MQTT and store in MongoDB"""
     try:
         payload = msg.payload.decode()
-        print(f"Received MQTT message: {payload}")
+        print(f"📩 Received MQTT message: {payload}")
         data = json.loads(payload)
 
         temp = data.get("temp")
@@ -64,30 +68,32 @@ def on_message(client, userdata, msg):
                 "time": datetime.utcnow()
             }
             collection.insert_one(document)
-
+            print("✅ Sensor data stored in MongoDB")
         else:
-            print("Missing fields in payload")
+            print("⚠️ Missing fields in payload")
     except Exception as e:
-        print(f"MQTT on_message error: {e}")
+        print(f"🚨 MQTT on_message error: {e}")
+
 
 def connect_mqtt():
-    mqtt_client_instance.on_connect = on_connect
-    mqtt_client_instance.on_message = on_message
-    mqtt_client_instance.connect(broker, port_mqtt)
-    mqtt_client_instance.loop_start()
+    try:
+        mqtt_client_instance.on_connect = on_connect
+        mqtt_client_instance.on_message = on_message
+        mqtt_client_instance.connect(broker, port_mqtt)
+        mqtt_client_instance.loop_start()
+        print("🚀 MQTT background thread started")
+    except Exception as e:
+        print(f"🚨 MQTT connection error: {e}")
 
-# Start MQTT in background thread
-mqtt_thread = threading.Thread(target=connect_mqtt)
-mqtt_thread.daemon = True
-mqtt_thread.start()
 
 # === Flask Routes ===
 @app.route("/", methods=["GET"])
 def index():
     return jsonify({"success": True, "message": "Server is running!"})
 
+
 @app.route("/addData", methods=["POST"])
-def addData():
+def add_data():
     try:
         data = request.json
         temp = data.get("temp")
@@ -109,8 +115,9 @@ def addData():
     except Exception as e:
         return jsonify({"success": False, "message": str(e)})
 
+
 @app.route("/getData", methods=["GET"])
-def getData():
+def get_data():
     try:
         latest = collection.find_one(sort=[("time", -1)])
         if not latest:
@@ -123,6 +130,7 @@ def getData():
         return jsonify({"success": True, "message": "Latest data fetched successfully", "object": latest})
     except Exception as e:
         return jsonify({"success": False, "message": str(e), "object": None})
+
 
 @app.route("/analyze", methods=["POST"])
 def analyze():
@@ -161,6 +169,7 @@ def analyze():
     except Exception as e:
         return jsonify({"success": False, "message": str(e)})
 
+
 @app.route("/setWindowStatus", methods=["POST"])
 def set_window_status():
     """Handle window control requests from React → Flask → Arduino (via MQTT)"""
@@ -172,28 +181,25 @@ def set_window_status():
         if status is None:
             return jsonify({"success": False, "message": "Missing 'status' field"})
 
-        # Convert boolean to text command
         command = "ON" if status else "OFF"
-
-        # Publish command to Arduino via MQTT
         mqtt_client_instance.publish(topic_command, command)
         print(f"📡 Published MQTT command: {command}")
 
-        # Update global status
         current_window_status = status
 
         return jsonify({"success": True, "message": f"Command '{command}' sent via MQTT"})
     except Exception as e:
         return jsonify({"success": False, "message": str(e)})
 
+
 @app.route("/getWindowStatus", methods=["GET"])
 def get_window_status():
-    """Return the current window status to the frontend."""
     try:
         global current_window_status
         return jsonify({"success": True, "status": current_window_status})
     except Exception as e:
         return jsonify({"success": False, "message": str(e)}), 500
+
 
 @app.route("/check_connection", methods=["GET"])
 def check_connection():
@@ -203,5 +209,11 @@ def check_connection():
     except Exception as e:
         return jsonify({"success": False, "message": str(e)})
 
+
+# === Run Flask + MQTT ===
 if __name__ == "__main__":
+    mqtt_thread = threading.Thread(target=connect_mqtt)
+    mqtt_thread.daemon = True
+    mqtt_thread.start()
+
     app.run(host="0.0.0.0", port=int(os.getenv("PORT", 5000)))
