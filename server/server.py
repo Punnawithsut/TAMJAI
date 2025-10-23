@@ -10,6 +10,7 @@ from paho.mqtt import client as mqtt_client
 import random
 import json
 import threading
+import requests
 
 # === Load environment variables ===
 load_dotenv()
@@ -31,6 +32,7 @@ port_mqtt = 1883
 topic_command = "comfortzone/command"
 topic_sensor = "comfortzone/sensor"
 client_id = f"flask-{random.randint(0, 1000)}"
+weather_api_key = os.getenv("WEATHER_API_KEY")
 
 mqtt_client_instance = mqtt_client.Client(
     callback_api_version=mqtt_client.CallbackAPIVersion.VERSION1,
@@ -199,6 +201,35 @@ def get_window_status():
         return jsonify({"success": True, "status": current_window_status})
     except Exception as e:
         return jsonify({"success": False, "message": str(e)}), 500
+@app.route("/getWeather", methods=["POST"])
+def getWeather():
+    try:
+        data = request.json
+        location = data.get("location")
+        if not location:
+            return jsonify({"success": False,
+                "message": "Location doesn't provide"})
+        url = f"http://api.weatherapi.com/v1/current.json?key={weather_api_key}&q={location}"
+        response = requests.get(url)
+
+        if response.status_code == 200:
+            data = response.json()
+            current = data.get("current", {})
+
+            result = {
+                "location": data.get("location", {}).get("name", "Unknown"),
+                "temp": current.get("feelslike_c"),
+                "windSpeed": current.get("wind_kph"),
+                "uv": current.get("uv"),
+            }
+
+        return jsonify({"success": True,
+            "message": "Successfully get weather data",
+            "object": result})
+    except Exception as e:
+        return jsonify({"success": False, 
+            "message": e,
+            "object": None})
 
 
 @app.route("/check_connection", methods=["GET"])

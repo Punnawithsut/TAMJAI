@@ -14,7 +14,7 @@ const DarknessSlider = () => {
         Darkness: <span>{darkness}%</span>
       </p>
 
-      <div className="relative w-full h-6 rounded-full bg-gray-300">
+      <div className="relative w-full h-7 rounded-full bg-gray-300">
         {/* Filled part */}
         <div
           className="absolute left-0 top-0 h-full rounded-full bg-[#1800ad]"
