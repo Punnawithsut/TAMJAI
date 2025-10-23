@@ -3,7 +3,7 @@ import { InformationContext } from "../contexts/InformationContext";
 import DarknessSlider from "../components/DarknessSlider";
 
 const Dashboard = () => {
-  const { temp, humidity, lux, windowStatus, setWindowStatus, getSensorData, handleWindowStatusChange } = useContext(InformationContext);
+  const { temp, humidity, lux, windowStatus, getWindowStatus, getSensorData, handleWindowStatusChange } = useContext(InformationContext);
   const tempEmojis = ["🥶", "🤧", "😊", "🥵", "🔥"];
   const luxEmojis = ["☁️", "⛅", "☀️"];
 
