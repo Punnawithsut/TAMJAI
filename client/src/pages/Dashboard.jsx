@@ -20,6 +20,7 @@ const Dashboard = () => {
     dataHistory,
     setDataHistory,
     handleWindowStatusChange,
+    handleDarknessChange,
   } = useContext(InformationContext);
 
   const tempEmojis = ["🥶", "🤧", "😊", "🥵", "🔥"];

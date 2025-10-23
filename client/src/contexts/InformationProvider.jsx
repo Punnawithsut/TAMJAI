@@ -3,6 +3,7 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { InformationContext } from "./InformationContext";
 
+// === Base URL (adjust for your Flask backend) ===
 const baseUrl = "http://127.0.0.1:5500/";
 axios.defaults.baseURL = baseUrl;
 
@@ -21,7 +22,7 @@ export const InformationProvider = ({ children }) => {
   const [apiWeather, setApiWeather] = useState({ location: null, temp: null, uv: null, windSpeed: null });
   const [dataHistory, setDataHistory] = useState([]);
 
-  // Fetch latest sensor data from server
+  // === Fetch latest sensor data ===
   const getSensorData = async () => {
     try {
       const response = await axios.get("/getData");
@@ -38,12 +39,11 @@ export const InformationProvider = ({ children }) => {
       setLux(sensor.lux);
       setTime(sensor.time);
     } catch (error) {
-      const message = error.response?.data?.message || error.message;
-      toast.error(message);
+      toast.error(error.response?.data?.message || error.message);
     }
   };
 
-  // Analyze sensor data using AI
+  // === Analyze comfort using AI (optional feature) ===
   const analyze = async () => {
     try {
       const payload = {
@@ -65,28 +65,47 @@ export const InformationProvider = ({ children }) => {
       toast.success("AI advice received!");
       setMessage(data.advice);
     } catch (error) {
-      const message = error.response?.data?.message || error.message;
-      toast.error(message);
+      toast.error(error.response?.data?.message || error.message);
     }
   };
 
-  // Update window status
+  // === Send command to open/close window ===
   const handleWindowStatusChange = async (status) => {
     setWindowStatus(status);
     try {
-      await axios.post("/setWindowStatus", { status });
-      toast.success(`Window turned ${status ? "ON" : "OFF"}`);
+      // This sends "open" or "close" to Arduino via Flask backend
+      await axios.post("/setWindowStatus", {
+        topic: "comfortzone/command",
+        message: status ? "open" : "close",
+      });
+      toast.success(`🪟 Window turned ${status ? "OPEN" : "CLOSED"}`);
     } catch (error) {
-      const message = error.response?.data?.message || error.message;
-      toast.error(message);
+      toast.error(error.response?.data?.message || error.message);
     }
   };
 
-  // Get user's location using browser Geolocation
+  // === Get window status from backend ===
+  const getWindowStatus = async () => {
+    try {
+      const response = await axios.get("/getWindowStatus");
+      const data = response.data;
+
+      if (!data.success) {
+        toast.error(data.message);
+        return;
+      }
+
+      setWindowStatus(data.status);
+    } catch (error) {
+      toast.error(error.response?.data?.message || error.message);
+    }
+  };
+
+  // === Get browser location ===
   const getLocation = async () => {
     return new Promise((resolve, reject) => {
       if (!navigator.geolocation) {
-        toast.error("Geolocation is not supported by your browser");
+        toast.error("Geolocation not supported by your browser");
         return reject("Geolocation not supported");
       }
 
@@ -104,11 +123,10 @@ export const InformationProvider = ({ children }) => {
     });
   };
 
-  // Get weather data from server
+  // === Get weather info ===
   const getWeather = async () => {
     try {
       const { latitude, longitude } = await getLocation();
-
       const response = await axios.post("/getWeather", {
         location: `${latitude},${longitude}`,
       });
@@ -122,29 +140,26 @@ export const InformationProvider = ({ children }) => {
       setApiWeather(data.object);
       toast.success(data.message);
     } catch (error) {
-      const message = error.response?.data?.message || error.message;
-      toast.error(message);
+      toast.error(error.response?.data?.message || error.message);
     }
   };
 
-  // Fetch current window status
-  const getWindowStatus = async () => {
+  // === Send Darkness Value ===
+  const handleDarknessChange = async (value) => {
+    setDarkness(value);
     try {
-      const response = await axios.get("/getWindowStatus");
-      const data = response.data;
-
-      if (!data.success) {
-        toast.error(data.message);
-        return;
-      }
-
-      setWindowStatus(data.status);
+      // Send JSON {darkness: value} to MQTT via backend
+      await axios.post("/setDarkness", {
+        topic: "comfortzone/command",
+        message: JSON.stringify({ darkness: value }),
+      });
+      toast.success(`🌑 Darkness set to ${value}%`);
     } catch (error) {
-      const message = error.response?.data?.message || error.message;
-      toast.error(message);
+      toast.error(error.response?.data?.message || error.message);
     }
   };
 
+  // === Values exposed to context ===
   const value = {
     temp,
     humidity,
@@ -176,6 +191,7 @@ export const InformationProvider = ({ children }) => {
     getWindowStatus,
     analyze,
     handleWindowStatusChange,
+    handleDarknessChange,
     getWeather,
   };
 
