@@ -20,7 +20,6 @@ export const InformationProvider = ({ children }) => {
     humidity: null,
     lux: null,
   });
-  const [customPrompt, setCustomPrompt] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [apiWeather, setApiWeather] = useState({
     "location" : null,
@@ -52,7 +51,7 @@ export const InformationProvider = ({ children }) => {
     }
   };
 
-  const analyze = async () => {
+  const analyze = async (customPrompt) => {
     try {
       const payload = {
         temp: customData?.temp ?? temp,
@@ -158,7 +157,6 @@ export const InformationProvider = ({ children }) => {
     weather,
     darkness,
     customData,
-    customPrompt,
     isLoading,
     apiWeather,
     dataHistory,
@@ -171,7 +169,6 @@ export const InformationProvider = ({ children }) => {
     setWeather,
     setDarkness,
     setCustomData,
-    setCustomPrompt,
     setIsLoading,
     setApiWeather,
     setDataHistory,

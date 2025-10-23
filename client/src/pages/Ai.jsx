@@ -9,8 +9,6 @@ const Ai = () => {
     lux,
     customData,
     setCustomData,
-    customPrompt,
-    setCustomPrompt,
     analyze,
     message,
     setMessage,
@@ -19,6 +17,8 @@ const Ai = () => {
   } = useContext(InformationContext);
 
   const [useCustom, setUseCustom] = useState(false);
+  const [customPrompt, setCustomPrompt] = useState("");
+  const [customPromptText, setCustomPromptText] = useState("");
   const [typedMessage, setTypedMessage] = useState("");
 
   //useEffect(() => {
@@ -44,8 +44,10 @@ const Ai = () => {
 
   const handleAnalyze = async () => {
     setIsLoading(true);
+    const promptToSend =
+      customPrompt === "other" ? customPromptText : customPrompt || "Give general room comfort advice.";
     setMessage("");
-    await analyze();
+    await analyze(promptToSend);
     setIsLoading(false);
   };
 
@@ -146,7 +148,8 @@ const Ai = () => {
             <input
               type="text"
               placeholder="Enter your custom question..."
-              onChange={(e) => setCustomPrompt(e.target.value)}
+              value={customPromptText}
+              onChange={(e) => setCustomPromptText(e.target.value)}
               className="w-full p-2 border rounded-lg"
             />
           )}
