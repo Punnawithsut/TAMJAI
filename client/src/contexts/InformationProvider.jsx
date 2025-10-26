@@ -70,17 +70,6 @@ export const InformationProvider = ({ children }) => {
     }
   };
 
-  // Update window status
-  const handleWindowStatusChange = async (status) => {
-    setWindowStatus(status);
-    try {
-      await axios.post("/setWindowStatus", { status });
-      toast.success(`Window turned ${status ? "ON" : "OFF"}`);
-    } catch (error) {
-      const message = error.response?.data?.message || error.message;
-      toast.error(message);
-    }
-  };
 
   // Get user's location using browser Geolocation
   const getLocation = async () => {
@@ -127,6 +116,18 @@ export const InformationProvider = ({ children }) => {
     }
   };
 
+  // Update window status
+  const handleWindowStatusChange = async (status) => {
+    setWindowStatus(status);
+    try {
+      await axios.post("/setWindowStatus", { status });
+      toast.success(`Window turned ${status ? "ON" : "OFF"}`);
+    } catch (error) {
+      const message = error.response?.data?.message || error.message;
+      toast.error(message);
+    }
+  };
+
   // Fetch current window status
   const getWindowStatus = async () => {
     try {
@@ -144,6 +145,38 @@ export const InformationProvider = ({ children }) => {
       toast.error(message);
     }
   };
+  // Update darkness value (send slider value to backend)
+const handleDarknessChange = async (value) => {
+  setDarkness(value); // update UI immediately
+  try {
+    await axios.post("/setLightStatus", { darkness: value });
+    toast.success(`Darkness set to ${value}%`);
+  } catch (error) {
+    const message = error.response?.data?.message || error.message;
+    toast.error(message);
+  }
+};
+
+// Fetch current darkness value from backend
+const getDarknessStatus = async () => {
+  try {
+    const response = await axios.get("/getLightStatus");
+    const data = response.data;
+
+    if (!data.success) {
+      toast.error(data.message);
+      return;
+    }
+
+    setDarkness(data.darkness); // update UI with current value
+  } catch (error) {
+    const message = error.response?.data?.message || error.message;
+    toast.error(message);
+  }
+};
+
+
+
 
   const value = {
     temp,
@@ -176,6 +209,8 @@ export const InformationProvider = ({ children }) => {
     getWindowStatus,
     analyze,
     handleWindowStatusChange,
+    handleDarknessChange,
+    getDarknessStatus,
     getWeather,
   };
 

@@ -13,13 +13,16 @@ const Dashboard = () => {
     humidity,
     lux,
     windowStatus,
+    darkness,
     getWindowStatus,
+    getDarknessStatus,
     getSensorData,
     getWeather,
     apiWeather,
     dataHistory,
     setDataHistory,
     handleWindowStatusChange,
+    handleDarknessChange,
   } = useContext(InformationContext);
 
   const tempEmojis = ["🥶", "🤧", "😊", "🥵", "🔥"];
@@ -53,9 +56,11 @@ const Dashboard = () => {
     getSensorData();
     getWeather();
     getWindowStatus();
+    getDarknessStatus();
     const interval = setInterval(() => {
       getSensorData()
-      getWindowStatus();
+      getWindowStatus()
+      getDarknessStatus();
     }, 20000);
     return () => clearInterval(interval);
   }, []);
@@ -156,7 +161,11 @@ const Dashboard = () => {
           <h3 className="font-bold text-lg mb-4 text-center">Control Panel</h3>
 
           <div className="flex flex-col gap-6">
-            <DarknessSlider />
+            <DarknessSlider
+                 value={darkness}
+                 onChange={handleDarknessChange}
+/>
+
 
             {/* Window Status */}
             <div>
