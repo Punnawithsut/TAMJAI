@@ -3,8 +3,8 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { InformationContext } from "./InformationContext";
 
-//const baseUrl = "https://comfortzone-backend.onrender.com/";
-const baseUrl = "http://127.0.0.1:5500/";
+const baseUrl = "https://comfortzone-backend.onrender.com/";
+//const baseUrl = "http://127.0.0.1:5500/";
 axios.defaults.baseURL = baseUrl;
 
 export const InformationProvider = ({ children }) => {
