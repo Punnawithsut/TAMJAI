@@ -270,8 +270,6 @@ def get_light_status():
     except Exception as e:
         return jsonify({"success": False, "message": str(e)}), 500
 
- 
-
 
 # === Run Flask + MQTT ===
 if __name__ == "__main__":
