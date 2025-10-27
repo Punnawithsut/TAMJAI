@@ -3,7 +3,7 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { InformationContext } from "./InformationContext";
 
-const baseUrl = "http://127.0.0.1:5500/";
+const baseUrl = "https://comfortzone-backend.onrender.com/";
 axios.defaults.baseURL = baseUrl;
 
 export const InformationProvider = ({ children }) => {
@@ -15,8 +15,11 @@ export const InformationProvider = ({ children }) => {
   const [message, setMessage] = useState("");
   const [weather, setWeather] = useState("Sunny");
   const [darkness, setDarkness] = useState(0);
-  const [customData, setCustomData] = useState({ temp: null, humidity: null, lux: null });
-  const [customPrompt, setCustomPrompt] = useState("");
+  const [customData, setCustomData] = useState({
+    temp: null,
+    humidity: null,
+    lux: null,
+  });
   const [isLoading, setIsLoading] = useState(false);
   const [apiWeather, setApiWeather] = useState({ location: null, temp: null, uv: null, windSpeed: null });
   const [dataHistory, setDataHistory] = useState([]);
@@ -43,8 +46,7 @@ export const InformationProvider = ({ children }) => {
     }
   };
 
-  // Analyze sensor data using AI
-  const analyze = async () => {
+  const analyze = async (customPrompt) => {
     try {
       const payload = {
         temp: customData?.temp ?? temp,
@@ -188,7 +190,6 @@ const getDarknessStatus = async () => {
     weather,
     darkness,
     customData,
-    customPrompt,
     isLoading,
     apiWeather,
     dataHistory,
@@ -201,7 +202,6 @@ const getDarknessStatus = async () => {
     setWeather,
     setDarkness,
     setCustomData,
-    setCustomPrompt,
     setIsLoading,
     setApiWeather,
     setDataHistory,
