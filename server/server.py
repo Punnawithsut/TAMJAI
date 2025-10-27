@@ -15,7 +15,11 @@ import requests
 load_dotenv()
 
 app = Flask(__name__)
-CORS(app)
+CORS(
+    app,
+    resources={r"/*": {"origins": "https://comfortzone-steel.vercel.app"}},
+    supports_credentials=True
+)
 
 # === MongoDB Setup ===
 mongo_client = MongoClient(os.getenv("MONGO_URI"))
