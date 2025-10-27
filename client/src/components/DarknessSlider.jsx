@@ -2,7 +2,7 @@ import { useContext,useEffect } from "react";
 import { InformationContext } from "../contexts/InformationContext";
 
 const DarknessSlider = () => {
-  const { darkness, setDarkness, handleDarknessChange, getDarknessStatus  } = useContext(InformationContext);
+  const { darkness, handleDarknessChange, getDarknessStatus  } = useContext(InformationContext);
   useEffect(() => {
     getDarknessStatus();
   }, [getDarknessStatus]);
