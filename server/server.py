@@ -241,7 +241,7 @@ def check_connection():
     except Exception as e:
         return jsonify({"success": False, "message": str(e)})
 
-        
+  
 @app.route("/setLightStatus", methods=["POST"])
 def set_light_status():
     global current_darkness
