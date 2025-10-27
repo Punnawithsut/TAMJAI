@@ -52,6 +52,7 @@ def on_connect(client, userdata, flags, rc):
 
 def on_message(client, userdata, msg):
     """Receive sensor data from Arduino via MQTT and store in MongoDB"""
+    global current_window_status
     try:
         payload = msg.payload.decode()
         print(f"📩 Received MQTT message: {payload}")
@@ -60,12 +61,21 @@ def on_message(client, userdata, msg):
         temp = data.get("temp")
         humidity = data.get("humidity")
         lux = data.get("lux")
+        window = data.get("window")
+        if window:
+            if window.lower() == "open":
+                current_window_status = True
+            elif window.lower() == "close":
+                current_window_status = False
+            print(f"🪟 Updated window status from Arduino: {current_window_status}")
 
+            # Store in MongoDB
         if temp is not None and humidity is not None and lux is not None:
             document = {
                 "temp": temp,
                 "humidity": humidity,
                 "lux": lux,
+                "window": window if window else ("open" if current_window_status else "close"),
                 "time": datetime.utcnow()
             }
             collection.insert_one(document)
