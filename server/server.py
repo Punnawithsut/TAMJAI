@@ -39,7 +39,7 @@ mqtt_client_instance = mqtt_client.Client(
 )
 
 current_window_status = False  # Store current window status
-
+current_darkness = 0 # Store current darkness status
 
 # === MQTT Event Handlers ===
 def on_connect(client, userdata, flags, rc):
