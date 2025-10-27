@@ -13,12 +13,16 @@ const Dashboard = () => {
     humidity,
     lux,
     windowStatus,
-    setWindowStatus,
+    darkness,
+    getWindowStatus,
+    getDarknessStatus,
     getSensorData,
     getWeather,
     apiWeather,
     dataHistory,
     setDataHistory,
+    handleWindowStatusChange,
+    handleDarknessChange,
   } = useContext(InformationContext);
 
   const tempEmojis = ["🥶", "🤧", "😊", "🥵", "🔥"];
@@ -51,8 +55,12 @@ const Dashboard = () => {
   useEffect(() => {
     getSensorData();
     getWeather();
+    getWindowStatus();
+    getDarknessStatus();
     const interval = setInterval(() => {
-      getSensorData();
+      getSensorData()
+      getWindowStatus()
+      getDarknessStatus();
     }, 20000);
     return () => clearInterval(interval);
   }, []);
@@ -153,7 +161,11 @@ const Dashboard = () => {
           <h3 className="font-bold text-lg mb-4 text-center">Control Panel</h3>
 
           <div className="flex flex-col gap-6">
-            <DarknessSlider />
+            <DarknessSlider
+                 value={darkness}
+                 onChange={handleDarknessChange}
+/>
+
 
             {/* Window Status */}
             <div>
@@ -162,7 +174,7 @@ const Dashboard = () => {
                 className={`w-14 h-8 flex items-center rounded-full p-1 cursor-pointer transition-colors duration-300 ${
                   windowStatus ? "bg-[#1800ad]" : "bg-gray-300"
                 }`}
-                onClick={() => setWindowStatus(!windowStatus)}
+                onClick={() => handleWindowStatusChange(!windowStatus)}
               >
                 <div
                   className={`bg-white w-6 h-6 rounded-full shadow transform transition-transform duration-300 ${

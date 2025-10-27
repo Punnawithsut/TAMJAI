@@ -21,14 +21,10 @@ export const InformationProvider = ({ children }) => {
     lux: null,
   });
   const [isLoading, setIsLoading] = useState(false);
-  const [apiWeather, setApiWeather] = useState({
-    "location" : null,
-    "temp" : null,
-    "uv" : null,
-    "windSpeed" : null,
-  });
+  const [apiWeather, setApiWeather] = useState({ location: null, temp: null, uv: null, windSpeed: null });
   const [dataHistory, setDataHistory] = useState([]);
 
+  // Fetch latest sensor data from server
   const getSensorData = async () => {
     try {
       const response = await axios.get("/getData");
@@ -44,7 +40,6 @@ export const InformationProvider = ({ children }) => {
       setHumidity(sensor.humidity);
       setLux(sensor.lux);
       setTime(sensor.time);
-      //console.log(`Get sensor data at ${time}`);
     } catch (error) {
       const message = error.response?.data?.message || error.message;
       toast.error(message);
@@ -77,6 +72,8 @@ export const InformationProvider = ({ children }) => {
     }
   };
 
+
+  // Get user's location using browser Geolocation
   const getLocation = async () => {
     return new Promise((resolve, reject) => {
       if (!navigator.geolocation) {
@@ -85,33 +82,9 @@ export const InformationProvider = ({ children }) => {
       }
 
       navigator.geolocation.getCurrentPosition(
-        async (position) => {
+        (position) => {
           const { latitude, longitude } = position.coords;
-
-          try {
-            const response = await axios.get(
-              `https://nominatim.openstreetmap.org/reverse`,
-              {
-                params: {
-                  lat: latitude,
-                  lon: longitude,
-                  format: "json",
-                },
-              }
-            );
-
-            const locationName =
-              response.data.address.city ||
-              response.data.address.town ||
-              response.data.address.village ||
-              response.data.address.county ||
-              "Unknown location";
-
-            resolve(locationName);
-          } catch (error) {
-            toast.error("Failed to get location name");
-            reject(error);
-          }
+          resolve({ latitude, longitude });
         },
         (error) => {
           toast.error("Unable to retrieve your location");
@@ -122,30 +95,90 @@ export const InformationProvider = ({ children }) => {
     });
   };
 
+  // Get weather data from server
   const getWeather = async () => {
     try {
-      const location = await getLocation();
-      //console.log(location);
-      
+      const { latitude, longitude } = await getLocation();
+
       const response = await axios.post("/getWeather", {
-        location: location,
+        location: `${latitude},${longitude}`,
       });
 
       const data = response.data;
-      if(!data.success) {
+      if (!data.success) {
         toast.error(data.message);
-        //console.log(data.message);
-        return
+        return;
       }
 
       setApiWeather(data.object);
-      console.log(data.object);
       toast.success(data.message);
     } catch (error) {
       const message = error.response?.data?.message || error.message;
       toast.error(message);
     }
   };
+
+  // Update window status
+  const handleWindowStatusChange = async (status) => {
+    setWindowStatus(status);
+    try {
+      await axios.post("/setWindowStatus", { status });
+      toast.success(`Window turned ${status ? "ON" : "OFF"}`);
+    } catch (error) {
+      const message = error.response?.data?.message || error.message;
+      toast.error(message);
+    }
+  };
+
+  // Fetch current window status
+  const getWindowStatus = async () => {
+    try {
+      const response = await axios.get("/getWindowStatus");
+      const data = response.data;
+
+      if (!data.success) {
+        toast.error(data.message);
+        return;
+      }
+
+      setWindowStatus(data.status);
+    } catch (error) {
+      const message = error.response?.data?.message || error.message;
+      toast.error(message);
+    }
+  };
+  // Update darkness value (send slider value to backend)
+const handleDarknessChange = async (value) => {
+  setDarkness(value); // update UI immediately
+  try {
+    await axios.post("/setLightStatus", { darkness: value });
+    toast.success(`Darkness set to ${value}%`);
+  } catch (error) {
+    const message = error.response?.data?.message || error.message;
+    toast.error(message);
+  }
+};
+
+// Fetch current darkness value from backend
+const getDarknessStatus = async () => {
+  try {
+    const response = await axios.get("/getLightStatus");
+    const data = response.data;
+
+    if (!data.success) {
+      toast.error(data.message);
+      return;
+    }
+
+    setDarkness(data.darkness); // update UI with current value
+  } catch (error) {
+    const message = error.response?.data?.message || error.message;
+    toast.error(message);
+  }
+};
+
+
+
 
   const value = {
     temp,
@@ -173,13 +206,13 @@ export const InformationProvider = ({ children }) => {
     setApiWeather,
     setDataHistory,
     getSensorData,
+    getWindowStatus,
     analyze,
+    handleWindowStatusChange,
+    handleDarknessChange,
+    getDarknessStatus,
     getWeather,
   };
 
-  return (
-    <InformationContext.Provider value={value}>
-      {children}
-    </InformationContext.Provider>
-  );
+  return <InformationContext.Provider value={value}>{children}</InformationContext.Provider>;
 };

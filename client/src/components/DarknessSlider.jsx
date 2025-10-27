@@ -1,12 +1,18 @@
-import { useContext } from "react";
+import { useContext,useEffect } from "react";
 import { InformationContext } from "../contexts/InformationContext";
 
 const DarknessSlider = () => {
-  const { darkness, setDarkness } = useContext(InformationContext);
+  const { darkness, handleDarknessChange, getDarknessStatus  } = useContext(InformationContext);
+  useEffect(() => {
+    getDarknessStatus();
+  }, [getDarknessStatus]);
 
   const handleChange = (e) => {
-    setDarkness(Number(e.target.value));
+    const value = Number(e.target.value);
+    handleDarknessChange(value); // update state + send to backend
+
   };
+
 
   return (
     <div>
