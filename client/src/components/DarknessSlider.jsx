@@ -10,9 +10,7 @@ const DarknessSlider = () => {
   const handleChange = (e) => {
     const value = Number(e.target.value);
     handleDarknessChange(value); // update state + send to backend
-
   };
-
 
   return (
     <div>

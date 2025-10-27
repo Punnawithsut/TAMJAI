@@ -241,6 +241,37 @@ def check_connection():
     except Exception as e:
         return jsonify({"success": False, "message": str(e)})
 
+        
+@app.route("/setLightStatus", methods=["POST"])
+def set_light_status():
+    global current_darkness
+    try:
+        data = request.json
+        darkness = data.get("darkness")
+
+        if darkness is None:
+            return jsonify({"success": False, "message": "Missing 'darkness' field"})
+
+        # Publish to MQTT or handle hardware here
+        mqtt_client_instance.publish(topic_command, str(darkness))
+        print(f"📡 Published MQTT command: Darkness = {darkness}%")
+
+        current_darkness = darkness
+        return jsonify({"success": True, "message": f"Darkness set to {darkness}%"})
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)})
+
+
+@app.route("/getLightStatus", methods=["GET"])
+def get_light_status():
+    try:
+        global current_darkness
+        return jsonify({"success": True, "darkness": current_darkness})
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)}), 500
+
+ 
+
 
 # === Run Flask + MQTT ===
 if __name__ == "__main__":

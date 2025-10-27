@@ -177,9 +177,6 @@ const getDarknessStatus = async () => {
   }
 };
 
-
-
-
   const value = {
     temp,
     humidity,
