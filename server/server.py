@@ -5,7 +5,6 @@ import os
 from dotenv import load_dotenv
 from flask_cors import CORS
 from datetime import datetime
-from bson import ObjectId
 from paho.mqtt import client as mqtt_client
 import random
 import json
@@ -201,6 +200,8 @@ def get_window_status():
         return jsonify({"success": True, "status": current_window_status})
     except Exception as e:
         return jsonify({"success": False, "message": str(e)}), 500
+
+
 @app.route("/getWeather", methods=["POST"])
 def getWeather():
     try:
