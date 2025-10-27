@@ -15,7 +15,7 @@ import requests
 load_dotenv()
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
 
 # === MongoDB Setup ===
 mongo_client = MongoClient(os.getenv("MONGO_URI"))
@@ -242,9 +242,14 @@ def check_connection():
         return jsonify({"success": False, "message": str(e)})
 
 
-@app.route("/setLightStatus", methods=["POST"])
+@app.route("/setLightStatus", methods=["POST", "OPTIONS"])
 def set_light_status():
     global current_darkness
+
+    # Handle preflight request
+    if request.method == "OPTIONS":
+        return jsonify({"success": True}), 200
+
     try:
         data = request.json
         darkness = data.get("darkness")
@@ -252,7 +257,6 @@ def set_light_status():
         if darkness is None:
             return jsonify({"success": False, "message": "Missing 'darkness' field"})
 
-        # Publish to MQTT or handle hardware here
         mqtt_client_instance.publish(topic_command, str(darkness))
         print(f"📡 Published MQTT command: Darkness = {darkness}%")
 
