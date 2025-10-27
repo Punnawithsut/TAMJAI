@@ -3,7 +3,7 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { InformationContext } from "./InformationContext";
 
-const baseUrl = "http://127.0.0.1:5500/";
+const baseUrl = "https://comfortzone-backend.onrender.com/";
 axios.defaults.baseURL = baseUrl;
 
 export const InformationProvider = ({ children }) => {
@@ -15,8 +15,11 @@ export const InformationProvider = ({ children }) => {
   const [message, setMessage] = useState("");
   const [weather, setWeather] = useState("Sunny");
   const [darkness, setDarkness] = useState(0);
-  const [customData, setCustomData] = useState({ temp: null, humidity: null, lux: null });
-  const [customPrompt, setCustomPrompt] = useState("");
+  const [customData, setCustomData] = useState({
+    temp: null,
+    humidity: null,
+    lux: null,
+  });
   const [isLoading, setIsLoading] = useState(false);
   const [apiWeather, setApiWeather] = useState({ location: null, temp: null, uv: null, windSpeed: null });
   const [dataHistory, setDataHistory] = useState([]);
@@ -43,8 +46,7 @@ export const InformationProvider = ({ children }) => {
     }
   };
 
-  // Analyze sensor data using AI
-  const analyze = async () => {
+  const analyze = async (customPrompt) => {
     try {
       const payload = {
         temp: customData?.temp ?? temp,
@@ -70,17 +72,6 @@ export const InformationProvider = ({ children }) => {
     }
   };
 
-  // Update window status
-  const handleWindowStatusChange = async (status) => {
-    setWindowStatus(status);
-    try {
-      await axios.post("/setWindowStatus", { status });
-      toast.success(`Window turned ${status ? "ON" : "OFF"}`);
-    } catch (error) {
-      const message = error.response?.data?.message || error.message;
-      toast.error(message);
-    }
-  };
 
   // Get user's location using browser Geolocation
   const getLocation = async () => {
@@ -127,6 +118,18 @@ export const InformationProvider = ({ children }) => {
     }
   };
 
+  // Update window status
+  const handleWindowStatusChange = async (status) => {
+    setWindowStatus(status);
+    try {
+      await axios.post("/setWindowStatus", { status });
+      toast.success(`Window turned ${status ? "ON" : "OFF"}`);
+    } catch (error) {
+      const message = error.response?.data?.message || error.message;
+      toast.error(message);
+    }
+  };
+
   // Fetch current window status
   const getWindowStatus = async () => {
     try {
@@ -144,6 +147,38 @@ export const InformationProvider = ({ children }) => {
       toast.error(message);
     }
   };
+  // Update darkness value (send slider value to backend)
+const handleDarknessChange = async (value) => {
+  setDarkness(value); // update UI immediately
+  try {
+    await axios.post("/setLightStatus", { darkness: value });
+    toast.success(`Darkness set to ${value}%`);
+  } catch (error) {
+    const message = error.response?.data?.message || error.message;
+    toast.error(message);
+  }
+};
+
+// Fetch current darkness value from backend
+const getDarknessStatus = async () => {
+  try {
+    const response = await axios.get("/getLightStatus");
+    const data = response.data;
+
+    if (!data.success) {
+      toast.error(data.message);
+      return;
+    }
+
+    setDarkness(data.darkness); // update UI with current value
+  } catch (error) {
+    const message = error.response?.data?.message || error.message;
+    toast.error(message);
+  }
+};
+
+
+
 
   const value = {
     temp,
@@ -155,7 +190,6 @@ export const InformationProvider = ({ children }) => {
     weather,
     darkness,
     customData,
-    customPrompt,
     isLoading,
     apiWeather,
     dataHistory,
@@ -168,7 +202,6 @@ export const InformationProvider = ({ children }) => {
     setWeather,
     setDarkness,
     setCustomData,
-    setCustomPrompt,
     setIsLoading,
     setApiWeather,
     setDataHistory,
@@ -176,6 +209,8 @@ export const InformationProvider = ({ children }) => {
     getWindowStatus,
     analyze,
     handleWindowStatusChange,
+    handleDarknessChange,
+    getDarknessStatus,
     getWeather,
   };
 
