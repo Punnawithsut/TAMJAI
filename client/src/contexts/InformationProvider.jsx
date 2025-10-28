@@ -157,8 +157,12 @@ export const InformationProvider = ({ children }) => {
 const handleDarknessChange = async (value) => {
   setDarkness(value); // update UI immediately
   try {
-    await axios.post("/setLightStatus", { darkness: value });
-    toast.success(`Darkness set to ${value}%`);
+    const response = await axios.post("/setLightStatus", { darkness: value });
+    const data = response.data;
+    if(!data.success) {
+      toast.error(data.message);
+    }
+    toast.success(data.message);
   } catch (error) {
     const message = error.response?.data?.message || error.message;
     toast.error(message);
