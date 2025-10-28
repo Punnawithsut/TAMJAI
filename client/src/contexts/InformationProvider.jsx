@@ -4,7 +4,7 @@ import toast from "react-hot-toast";
 import { InformationContext } from "./InformationContext";
 
 const baseUrl = "https://comfortzone-backend.onrender.com/";
-//const baseUrl = "http://127.0.0.1:5500/";
+//const baseUrl = "http://127.0.0.1:6000/";
 axios.defaults.baseURL = baseUrl;
 
 export const InformationProvider = ({ children }) => {
@@ -123,8 +123,13 @@ export const InformationProvider = ({ children }) => {
   const handleWindowStatusChange = async (status) => {
     setWindowStatus(status);
     try {
-      await axios.post("/setWindowStatus", { status });
-      toast.success(`Window turned ${status ? "ON" : "OFF"}`);
+      const response = await axios.post("/setWindowStatus", { status });
+      const data = response.data;
+      if (!data.success) {
+        toast.error(data.message);
+        return;
+      }
+      toast.success(data.message);
     } catch (error) {
       const message = error.response?.data?.message || error.message;
       toast.error(message);
