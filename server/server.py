@@ -98,7 +98,7 @@ def connect_mqtt():
 
 
 # === Flask Routes ===
-@app.before_first_request
+@app.before_request
 def start_mqtt():
     mqtt_thread = threading.Thread(target=connect_mqtt)
     mqtt_thread.daemon = True
