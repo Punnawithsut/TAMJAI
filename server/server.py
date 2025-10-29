@@ -102,12 +102,6 @@ def start_mqtt():
     mqtt_thread.start()
     print("🚀 MQTT thread started under Gunicorn worker")
 
-if __name__ == "__main__":
-    mqtt_thread = threading.Thread(target=connect_mqtt)
-    mqtt_thread.daemon = True
-    mqtt_thread.start()
-    app.run(host="0.0.0.0", port=int(os.getenv("PORT", 5000)))
-
 
 @app.route("/", methods=["GET"])
 def index():

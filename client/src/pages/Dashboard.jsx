@@ -84,11 +84,11 @@ const Dashboard = () => {
                 <p className="text-6xl mb-4 mt-4">
                   {temp < 5
                     ? tempEmojis[0]
-                    : temp < 10
+                    : temp < 15
                     ? tempEmojis[1]
-                    : temp < 20
+                    : temp < 25
                     ? tempEmojis[2]
-                    : temp < 30
+                    : temp < 35
                     ? tempEmojis[3]
                     : tempEmojis[4]}
                 </p>
